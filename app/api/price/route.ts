@@ -43,6 +43,11 @@ export async function GET() {
 
     const result = res2 ? JSON.parse(res2) : undefined;
 
+    console.log("BIDS??", result?.bids)
+    console.log("BIDS0??", result?.bids[0])
+    console.log("BIDS00??", result?.bids[0][0])
+    
+
     const bid0 = result?.bids[0][0] * 1;
     const myOffer = bid0 ? bid0 * 0.95 : 0;
 
