@@ -1,6 +1,7 @@
 "use client"; // This is a client component
 
 import { ToDo } from "@/types/todo";
+import { PairPrice } from "@/types/price";
 import Link from "next/link";
 import Image from "next/image";
 import "./globals.css";
@@ -13,6 +14,72 @@ interface TodoItemProps {
   todo: ToDo;
   onDelete: (id: number) => void;
   handleToggleDone: (id: number) => void;
+}
+
+interface PriceItemProps {
+  price: PairPrice;
+}
+
+const PriceItem = (props: PriceItemProps) => {
+  const { price } = props;
+  const { myOffer, bid0, ticker, toFixed } = price;
+
+  return (
+    <div className="flex justify-between rounded-full p-1 w-2/5">
+      <table className="rounded-full">
+        <thead>
+          <tr>
+            <th>Pair</th>
+            <th>My Offer</th>
+            <th>Bid</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>{ticker}</td>
+            <td>{myOffer.toFixed(2)}</td>
+            <td>{toFixed ? bid0.toFixed(2) : bid0}</td>
+          </tr>
+        </tbody>
+      </table>
+      <br />
+      {/* <li
+        key={pair}
+        className="relative rounded-md py-3 px-5 flex items-center gap-x-3"
+      >
+        <h2
+          className={
+            myOffer
+              ? "text-md font-medium leading-5 text-gray-700"
+              : "text-md font-medium leading-5 text-gray-700"
+          }
+        >
+          {pair}
+        </h2>
+        <br />
+        <h2
+          className={
+            myOffer
+              ? "text-md font-medium leading-5 text-gray-700"
+              : "text-md font-medium leading-5 text-gray-700"
+          }
+        >
+          {myOffer}
+        </h2>
+        <br />
+        <h2
+          className={
+            myOffer
+              ? "text-md font-medium leading-5 text-gray-700"
+              : "text-md font-medium leading-5 text-gray-700"
+          }
+        >
+          {bid0}
+        </h2>
+      </li> */}
+    </div>
+  );
 }
 
 const TodoItem = (props: TodoItemProps) => {
@@ -51,15 +118,43 @@ const TodoItem = (props: TodoItemProps) => {
 
 export default function Home() {
   const [todos, setTodos] = useState<ToDo[]>([]);
+  const [prices, setPrice] = useState<PairPrice[]>([]);
   const [loading, setLoading] = useState(false);
+  const [time, setTime] = useState(5);
 
+  // let time: number = 0; // Initialize 'time' variable with a default value
+
+  let t1 = 5;
   useEffect(() => {
     setLoading(true);
     fetch("/api/todos")
       .then((res) => res.json())
       .then((data) => setTodos(data))
       .finally(() => setLoading(false));
+
+
+    setInterval(() => {
+      t1 = t1-1
+      setTime(t1)
+    }, 1000);
   }, []);
+
+  useEffect(() => {
+    
+    setInterval(() => {
+      // setLoading(true);
+      t1 = 5;
+      setTime(t1)
+      fetch("/api/price")
+        .then((response) => response.json())
+        .then((data) => setPrice(data))
+        .catch((error) => console.error(error))
+        // .finally(() => setLoading(false));
+    }, 5000);
+
+  }, []);
+
+ 
 
   const handleDeleteTodo = (id: number) => {
     fetch("/api/todos", {
@@ -93,10 +188,31 @@ export default function Home() {
 
   return (
     <main className="flex flex-col min-h-screen items-center justify-center p-24 w-screen h-screen">
+
+      {prices.map((price: PairPrice) => (
+        <PriceItem key={price.ticker} price={price} />
+      ))}
+
+
       <div className="flex gap-x-4  my-24 items-center">
         <Image src={checkList} alt="checklist icon" />
         <h1 className="text-5xl font-bold text-gray-700">ToDo List </h1>
       </div>
+
+      
+
+      {/* <div className="mb-32 mx-auto flex-col flex gap-y-2 justify-center">
+        <h2 className="text-2xl font-semibold text-gray-700">
+          My Offer: {prices?.myOffer.toFixed(2)}
+        </h2>
+        <h2 className="text-2xl font-semibold text-gray-700">
+          Bid: {prices?.bid0}
+        </h2>
+
+        <h2 className="text-2xl font-semibold text-gray-700">
+          {time}
+        </h2>
+      </div> */}
 
       <div className="mb-32 mx-auto flex-col flex gap-y-2 w-full justify-center">
         {loading ? (
